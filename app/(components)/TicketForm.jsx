@@ -22,14 +22,14 @@ const TicketForm = () => {
       method: "POST",
       body: JSON.stringify({ formData }),
       "Content-Type": "application/json",
-    })
+    });
 
     if (!res.ok) {
       throw new Error("Fallo al crear el Ticket.")
     }
 
-    router.refresh()
     router.push("/")
+    router.refresh()
   };
 
   const startingTicketData = {
@@ -37,7 +37,7 @@ const TicketForm = () => {
     description: "",
     priority: 1,
     progress: 0,
-    status: "no empezado",
+    status: "No empezado",
     category: "Problema de Hardware"
   };
 
@@ -141,9 +141,9 @@ const TicketForm = () => {
         />
         <label>Estado</label>
         <select name="status" value={formData.status} onChange={handleChange}>
-          <option value="not started">No empezado</option>
-          <option value="started">Empezado</option>
-          <option value="done">Hecho</option>
+          <option value="no empezado">No empezado</option>
+          <option value="empezado">Empezado</option>
+          <option value="hecho">Hecho</option>
         </select>
         <input type="submit" className="btn" value="Crear Ticket" />
       </form>
