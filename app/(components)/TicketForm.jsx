@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation"
 import React, { useState } from "react";
 
-const TicketForm = () => {
+const TicketForm = ({ ticket }) => {
+
+  const EDITMODE = ticket._id === "nuevo" ? false : true;
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -18,14 +20,27 @@ const TicketForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/Tickets", {
-      method: "POST",
-      body: JSON.stringify({ formData }),
-      "Content-Type": "application/json",
-    });
 
-    if (!res.ok) {
-      throw new Error("Fallo al crear el Ticket.")
+    if (EDITMODE) {
+      const res = await fetch(`/api/Tickets/${ticket._id}`, {
+        method: "PUT",
+        body: JSON.stringify({ formData }),
+        "Content-Type": "application/json",
+      });
+
+      if (!res.ok) {
+        throw new Error("Fallo al actualizar el Ticket.")
+      }
+    } else {
+      const res = await fetch("/api/Tickets", {
+        method: "POST",
+        body: JSON.stringify({ formData }),
+        "Content-Type": "application/json",
+      });
+
+      if (!res.ok) {
+        throw new Error("Fallo al crear el Ticket.")
+      }
     }
 
     router.push("/")
@@ -41,6 +56,15 @@ const TicketForm = () => {
     category: "Problema de Hardware"
   };
 
+  if (EDITMODE) {
+    startingTicketData["title"] = ticket.title
+    startingTicketData["description"] = ticket.description
+    startingTicketData["priority"] = ticket.priority
+    startingTicketData["progress"] = ticket.progress
+    startingTicketData["status"] = ticket.status
+    startingTicketData["category"] = ticket.category
+  }
+
   const [formData, setFormData] = useState(startingTicketData);
   return (
     <div className="flex justify-center">
@@ -49,7 +73,7 @@ const TicketForm = () => {
         method="post"
         onSubmit={handleSubmit}
       >
-        <h3>Crea Tu Ticket</h3>
+        <h3>{EDITMODE ? "Actualiza Tu Ticket" : "Crea Tu Ticket"}</h3>
         <label>Titulo</label>
         <input
           id="title"
@@ -145,7 +169,7 @@ const TicketForm = () => {
           <option value="empezado">Empezado</option>
           <option value="hecho">Hecho</option>
         </select>
-        <input type="submit" className="btn" value="Crear Ticket" />
+        <input type="submit" className="btn" value={EDITMODE ? "Actualizar Ticket" : "Crear Ticket"} />
       </form>
     </div>
   )
